@@ -1,5 +1,5 @@
 {
-  "name": "@inbox-triage/shared-types",
+  "name": "@threadsense/shared-types",
   "version": "0.1.0",
   "private": true,
   "type": "module",

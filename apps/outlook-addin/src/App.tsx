@@ -1,58 +1,108 @@
-import { CatchUpList } from "./components/CatchUpList";
-import { DraftReplyCard } from "./components/DraftReplyCard";
-import { PanelSection } from "./components/PanelSection";
-import { sampleThread, sampleTriageResponse } from "./data/mockData";
+import { useEffect } from "react";
+import { CatchUpBriefing } from "./components/CatchUpBriefing";
+import { LoadingPane } from "./components/LoadingPane";
+import { SettingsSection } from "./components/SettingsSection";
+import { StateView } from "./components/StateView";
+import { TaskPaneContent } from "./components/TaskPaneContent";
+import { useThreadSense } from "./hooks/useThreadSense";
 
 export function App() {
+  const { adapterMode, clearHistory, data, error, history, isLoading, lastAction, mode, settings, setSettings, view, runAction } =
+    useThreadSense();
+
+  useEffect(() => {
+    void runAction("scan");
+  }, [runAction]);
+
   return (
-    <main className="app-shell">
-      <header className="panel-header">
-        <div>
-          <p className="eyebrow">Inbox Triage</p>
-          <h1>Mock Outlook Task Pane</h1>
+    <div className="app-frame">
+      <aside className="app-shell">
+        <div className="dev-toolbar" aria-label="Connection state">
+          <span className="dev-toolbar__status">{mode === "api" ? "Local API" : "Mock data"}</span>
+          <span className="dev-toolbar__status muted">{adapterMode === "outlook" ? "Outlook source" : "Mock source"}</span>
+          {lastAction ? <span className="dev-toolbar__status muted">Last action: {lastAction}</span> : null}
         </div>
-        <span className="mode-badge">Mock mode only</span>
-      </header>
 
-      <section className="thread-context">
-        <p className="thread-label">Current thread</p>
-        <h2>{sampleThread.subject}</h2>
-        <p>
-          {sampleThread.participants.join(", ")} • {sampleThread.messageCount} messages
-        </p>
-      </section>
-
-      <div className="panel-grid">
-        <PanelSection title="Verdict">
-          <p className="verdict">{sampleTriageResponse.verdict}</p>
-          <p>{sampleTriageResponse.rationale}</p>
-        </PanelSection>
-
-        <PanelSection title="Summary">
-          <p>{sampleTriageResponse.summary.overview}</p>
-          <ul>
-            {sampleTriageResponse.summary.bullets.map((bullet) => (
-              <li key={bullet}>{bullet}</li>
-            ))}
-          </ul>
-        </PanelSection>
-
-        <PanelSection title="Direct Asks">
-          <ul>
-            {sampleTriageResponse.directAsks.map((ask) => (
-              <li key={ask.id}>
-                <strong>{ask.owner}</strong>: {ask.request}
-              </li>
-            ))}
-          </ul>
-        </PanelSection>
-
-        <DraftReplyCard />
-
-        <PanelSection title="Catch Up List">
-          <CatchUpList />
-        </PanelSection>
-      </div>
-    </main>
+        {isLoading && !data ? <LoadingPane /> : null}
+        {!isLoading && !data && !error ? (
+          <>
+            <StateView
+              title={adapterMode === "outlook" ? "No Outlook message available" : "No thread selected"}
+              description={
+                adapterMode === "outlook"
+                  ? "The Outlook adapter stub can only read the current message context. Open a message in reading mode, or switch to mock source for local fixtures."
+                  : "Open an email thread to see a summary, direct asks, and a draft reply in this panel."
+              }
+              actionLabel="Scan this thread"
+              onAction={() => void runAction("scan")}
+            />
+            <div className="task-pane__stack">
+              <SettingsSection
+                settings={settings}
+                history={history}
+                onChange={setSettings}
+                onClearHistory={clearHistory}
+              />
+            </div>
+          </>
+        ) : null}
+        {error && !data ? (
+          <>
+            <StateView
+              title="Unable to load ThreadSense"
+              description={error}
+              actionLabel="Refresh"
+              onAction={() => void runAction("refresh")}
+            />
+            <div className="task-pane__stack">
+              <SettingsSection
+                settings={settings}
+                history={history}
+                onChange={setSettings}
+                onClearHistory={clearHistory}
+              />
+            </div>
+          </>
+        ) : null}
+        {data && view === "thread" ? (
+          <TaskPaneContent
+            thread={data.thread}
+            mode={mode}
+            isBusy={isLoading}
+            error={error}
+            onScanThread={() => void runAction("scan")}
+            onCatchMeUp={() => void runAction("catchup")}
+            onRefresh={() => void runAction("refresh")}
+            settings={settings}
+            history={history}
+            onSettingsChange={setSettings}
+            onClearHistory={clearHistory}
+            triage={data.triage}
+            summary={data.summary}
+            askExtraction={data.askExtraction}
+            draftReplySet={data.draftReplySet}
+            catchUpOverview={data.catchUpOverview}
+            thoughtPartner={data.thoughtPartner}
+          />
+        ) : null}
+        {data && view === "catchup" ? (
+          <CatchUpBriefing
+            overview={data.catchUpOverview}
+            mode={mode}
+            isBusy={isLoading}
+            threadSubject={data.thread.subject}
+            unreadCount={data.thread.unreadCount}
+            error={error}
+            onScanThread={() => void runAction("scan")}
+            onCatchMeUp={() => void runAction("catchup")}
+            onRefresh={() => void runAction("refresh")}
+            settings={settings}
+            history={history}
+            onSettingsChange={setSettings}
+            onClearHistory={clearHistory}
+          />
+        ) : null}
+      </aside>
+    </div>
   );
 }

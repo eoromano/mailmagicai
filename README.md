@@ -1,70 +1,90 @@
-# Inbox Triage
+# ThreadSense
 
-Inbox Triage is a safe MVP monorepo for an AI email triage copilot. The first version is intentionally mock-only and focuses on helping a user catch up on unread mail, summarize threads, extract direct asks, and draft replies without connecting to a real mailbox.
+ThreadSense is a mock-first MVP monorepo for an AI email triage copilot. It helps a user catch up on unread mail, summarize threads, extract direct asks, draft replies, and think through what is really happening in a thread without touching a real mailbox yet.
 
-## Monorepo Layout
+## Milestone Status
+
+This first milestone is coherent and runnable today:
+
+- Outlook-style task pane in React + TypeScript
+- local mock adapter plus a minimal Outlook adapter stub
+- FastAPI backend with deterministic triage, summarization, ask extraction, draft reply, catch-up, and thought-partner flows
+- shared contracts across the add-in and API
+- local settings, history, and mock-mode controls
+- model-ready backend service boundaries with deterministic fallback behavior
+
+Default development is safe and local-first. No real mailbox access, auth, Graph integration, or live LLM calls are enabled.
+
+## Demo
+
+Mock mode task pane:
+
+![ThreadSense mock mode](/Users/roman/Documents/mailmagic/docs/images/mock-mode-task-pane.svg)
+
+## Repo Shape
 
 ```text
 apps/
-  outlook-addin/     React + TypeScript mock task pane
+  outlook-addin/     Outlook-style task pane built with React + TypeScript
 services/
-  api/               FastAPI scaffold with placeholder AI endpoints
+  api/               FastAPI service with deterministic intelligence features
 packages/
-  shared-types/      Shared TypeScript schemas and example types
-docs/                Product and local setup notes
+  shared-types/      Shared TypeScript schemas and example mocks
+docs/                Product, setup, and milestone notes
+scripts/             Thin local development helpers
 ```
-
-## What Is Included
-
-- Mock Outlook add-in panel shell with placeholder sections for:
-  - verdict
-  - summary
-  - direct asks
-  - draft reply
-  - catch up list
-- FastAPI service scaffold with:
-  - `GET /health`
-  - `POST /triage/thread`
-  - `POST /summarize/thread`
-  - `POST /extract/asks`
-  - `POST /draft/reply`
-  - `POST /catchup`
-- Shared TypeScript schemas for:
-  - email thread
-  - triage result
-  - summary result
-- Mock fixtures for a sample thread and triage response
-- Environment templates and local run instructions
 
 ## Quick Start
 
-### 1. Frontend
-
 ```bash
-cd apps/outlook-addin
-cp .env.example .env.local
 npm install
-npm run dev
+npm run setup:api
+npm run dev:addin
+npm run dev:api
 ```
 
-The mock task pane will be available through Vite in local development.
+The add-in runs on `http://127.0.0.1:3000` and the API runs on `http://127.0.0.1:8000`.
 
-### 2. API
+For the simplest demo:
+
+- keep `apps/outlook-addin/.env.local` aligned with `VITE_APP_MODE=mock`
+- keep `VITE_MESSAGE_SOURCE=mock`
+- open the add-in and click `Scan this thread`
+
+For deterministic backend mode:
+
+- set `VITE_APP_MODE=api`
+- keep `VITE_MESSAGE_SOURCE=mock`
+- run the local FastAPI service
+
+## Local Validation
 
 ```bash
-cd services/api
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.main:app --reload
+npm run check
+cd services/api && .venv/bin/pytest -q
 ```
 
-The API will run at `http://127.0.0.1:8000`.
+## What Is Complete
 
-## Notes
+- Mock task pane experience with loading, empty, error, catch-up, thought-partner, and settings flows
+- End-to-end local API path with typed client wiring
+- Deterministic intelligence features for triage, summarize, ask extraction, draft reply, catch-up, and thought partner
+- Adapter boundary for future Outlook message access
+- Storage boundary for future settings persistence
+- Model boundary for future LLM-assisted features
 
-- No Outlook mailbox integration is included yet.
-- No Microsoft Graph integration is included yet.
-- No authentication is included yet.
-- All responses are mocked to keep the MVP safe and easy to iterate on.
+## What Comes Next
+
+- Real Outlook reading-mode integration
+- Better mailbox-sourced fixtures and thread ingestion
+- Backend persistence for settings and history
+- Real model client implementation behind the structured feature layer
+- Authentication and account-aware behavior
+
+## Where To Start
+
+- Read [apps/outlook-addin/README.md](/Users/roman/Documents/mailmagic/apps/outlook-addin/README.md) for the task pane app
+- Read [services/api/README.md](/Users/roman/Documents/mailmagic/services/api/README.md) for the backend
+- Read [packages/shared-types/README.md](/Users/roman/Documents/mailmagic/packages/shared-types/README.md) for shared contract notes
+- Read [docs/setup.md](/Users/roman/Documents/mailmagic/docs/setup.md) for the local run path
+- Read [docs/architecture.md](/Users/roman/Documents/mailmagic/docs/architecture.md) for the current MVP structure

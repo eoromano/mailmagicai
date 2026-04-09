@@ -2,8 +2,10 @@ node_modules/
 .venv/
 __pycache__/
 .pytest_cache/
+*.pyc
 dist/
 build/
 .DS_Store
+coverage/
 .env
 .env.local

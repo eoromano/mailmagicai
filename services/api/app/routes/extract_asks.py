@@ -1,17 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.schemas.common import EmailThread
-from app.schemas.responses import AskItem
+from app.schemas.requests import ThreadRequest
+from app.schemas.responses import AskExtractionResult
+from app.services import MockEmailTriageService
 
 router = APIRouter(prefix="/extract", tags=["extract"])
 
 
-@router.post("/asks", response_model=list[AskItem])
-def extract_asks(thread: EmailThread) -> list[AskItem]:
-    return [
-        AskItem(
-            id="ask-placeholder-1",
-            owner="You",
-            request=f"Review open asks in '{thread.subject}'.",
-        )
-    ]
+def get_service() -> MockEmailTriageService:
+    return MockEmailTriageService()
+
+
+@router.post("/asks", response_model=AskExtractionResult)
+def extract_asks(
+    request: ThreadRequest, service: MockEmailTriageService = Depends(get_service)
+) -> AskExtractionResult:
+    return service.extract_asks(request.thread, request.user_settings)

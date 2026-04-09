@@ -1,13 +1,20 @@
 {
-  "name": "inbox-triage",
+  "name": "threadsense",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev:addin": "npm --workspace @inbox-triage/outlook-addin run dev",
-    "build:addin": "npm --workspace @inbox-triage/outlook-addin run build"
+    "dev": "printf 'Run npm run dev:addin and npm run dev:api in separate shells.\\n'",
+    "dev:addin": "npm --workspace @threadsense/outlook-addin run dev",
+    "build:addin": "npm --workspace @threadsense/outlook-addin run build",
+    "check:addin": "npm --workspace @threadsense/outlook-addin run check",
+    "check": "npm run check:addin && npm run check:api",
+    "setup:api": "./scripts/setup-api.sh",
+    "dev:api": "./scripts/dev-api.sh",
+    "check:api": "./scripts/check-api.sh"
   }
 }

@@ -1,11 +1,16 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class EmailMessage(BaseModel):
     id: str
-    from_: str = Field(alias="from")
+    from_name: str = Field(alias="fromName")
+    from_email: str = Field(alias="fromEmail")
+    to_recipients: list[str] = Field(default_factory=list, alias="toRecipients")
+    cc_recipients: list[str] = Field(default_factory=list, alias="ccRecipients")
     sent_at: str = Field(alias="sentAt")
-    body: str
+    body_text: str = Field(alias="bodyText")
+    is_unread: bool = Field(alias="isUnread")
 
     model_config = {"populate_by_name": True}
 

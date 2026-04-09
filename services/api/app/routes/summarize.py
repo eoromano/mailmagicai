@@ -1,17 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.schemas.common import EmailThread
-from app.schemas.responses import SummaryResponse
+from app.schemas.requests import ThreadRequest
+from app.schemas.responses import ThreadSummary
+from app.services import MockEmailTriageService
 
 router = APIRouter(prefix="/summarize", tags=["summarize"])
 
 
-@router.post("/thread", response_model=SummaryResponse)
-def summarize_thread(thread: EmailThread) -> SummaryResponse:
-    return SummaryResponse(
-        overview=f"Mock summary for '{thread.subject}'.",
-        bullets=[
-            "This endpoint currently returns placeholder content.",
-            "Real summarization logic will plug in later.",
-        ],
-    )
+def get_service() -> MockEmailTriageService:
+    return MockEmailTriageService()
+
+
+@router.post("/thread", response_model=ThreadSummary)
+def summarize_thread(
+    request: ThreadRequest, service: MockEmailTriageService = Depends(get_service)
+) -> ThreadSummary:
+    return service.summarize_thread(request.thread, request.user_settings)

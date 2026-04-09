@@ -1,12 +1,13 @@
 {
-  "name": "@inbox-triage/outlook-addin",
+  "name": "@threadsense/outlook-addin",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^18.3.1",
