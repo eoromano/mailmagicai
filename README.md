@@ -57,6 +57,35 @@ For deterministic backend mode:
 - keep `VITE_MESSAGE_SOURCE=mock`
 - run the local FastAPI service
 
+## GitHub Pages
+
+The repo is now prepared to publish the ThreadSense frontend to GitHub Pages through GitHub Actions.
+
+What it deploys:
+
+- the Outlook add-in frontend only
+- default Pages build mode is `mock`
+- the deployed site is suitable for demoing the task pane UI and for generating an Outlook manifest that points at a public HTTPS URL
+
+What it does not deploy:
+
+- the FastAPI backend
+
+After pushing to `main`:
+
+1. In GitHub, open repository `Settings` -> `Pages`
+2. Under `Source`, choose `GitHub Actions`
+3. Wait for the `Deploy ThreadSense Frontend` workflow to finish
+4. Your site should publish at:
+
+`https://eoromano.github.io/mailmagicai/`
+
+Once that URL is live, generate the Outlook manifest with:
+
+```bash
+./scripts/generate-outlook-manifest.sh https://eoromano.github.io/mailmagicai
+```
+
 ## Local Validation
 
 ```bash

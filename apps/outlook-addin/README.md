@@ -32,6 +32,63 @@ VITE_APP_MODE=mock
 VITE_MESSAGE_SOURCE=mock
 ```
 
+## Outlook On The Web Test Path
+
+Outlook on the web expects an XML manifest file and an HTTPS-hosted add-in URL.
+
+1. Start the add-in locally:
+
+```bash
+npm run dev:addin
+```
+
+2. Expose it over HTTPS with a tunnel such as:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+or
+
+```bash
+ngrok http 3000
+```
+
+3. Generate the uploadable manifest:
+
+```bash
+./scripts/generate-outlook-manifest.sh https://your-https-url
+```
+
+4. Upload the generated file:
+
+`apps/outlook-addin/manifest/dist/threadsense-manifest.xml`
+
+In Outlook on the web:
+
+- `Get Add-ins`
+- `My add-ins`
+- `Add a custom add-in`
+- `Add from file`
+
+5. Open a message in read mode and use the `Open ThreadSense` command.
+
+## GitHub Pages Option
+
+If you want a fast public HTTPS host without running a tunnel, the repo now includes a GitHub Pages workflow for the add-in frontend.
+
+Expected Pages URL for this repository:
+
+`https://eoromano.github.io/mailmagicai/`
+
+Once Pages is live, you can generate the Outlook manifest with:
+
+```bash
+./scripts/generate-outlook-manifest.sh https://eoromano.github.io/mailmagicai
+```
+
+That gives you a stable public manifest target for Outlook on the web testing.
+
 ## Adapter Modes
 
 - `VITE_MESSAGE_SOURCE=mock` uses the mock adapter and returns normalized threads built from local fixtures.
@@ -57,6 +114,7 @@ VITE_MESSAGE_SOURCE=mock
 - The app now references Office.js from the Microsoft CDN in `index.html`, which is the supported loading pattern for Office Add-ins.
 - To test current-message reading, run the app inside Outlook with a message open in reading mode.
 - If Outlook isn't available, or the current context is unsupported, the adapter returns no thread and the task pane can still fall back to mock mode.
+- The generated manifest uses a `MessageReadCommandSurface` button with `ShowTaskpane`, which is the standard sideload path for testing a read-mode Outlook add-in.
 
 ## Current Scope
 
