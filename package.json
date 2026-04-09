@@ -1,0 +1,13 @@
+{
+  "name": "inbox-triage",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:addin": "npm --workspace @inbox-triage/outlook-addin run dev",
+    "build:addin": "npm --workspace @inbox-triage/outlook-addin run build"
+  }
+}
