@@ -1,6 +1,6 @@
 # ThreadSense
 
-ThreadSense is a mock-first MVP monorepo for an AI email triage copilot. It helps a user catch up on unread mail, summarize threads, extract direct asks, draft replies, and think through what is really happening in a thread without touching a real mailbox yet.
+ThreadSense is an AI email triage copilot. It helps a user catch up on unread mail, summarize threads, extract direct asks, draft replies, and think through what is really happening in a thread.
 
 ## Milestone Status
 
